@@ -1,6 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
+using System.Collections.Generic;
+using System.Security.AccessControl;
 using System.Security.Cryptography.X509Certificates;
 
 namespace Monogame_4___Assignment
@@ -11,7 +14,6 @@ namespace Monogame_4___Assignment
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
-        Star star1;
 
         Rectangle window;
 
@@ -19,6 +21,13 @@ namespace Monogame_4___Assignment
 
         Texture2D starTexture, shipTexture;
         
+        List<Star> closeStars, farStars;
+
+        Random generator;
+
+        KeyboardState keyboardState;
+
+
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -35,11 +44,31 @@ namespace Monogame_4___Assignment
             _graphics.ApplyChanges();
 
 
+            generator = new Random();
+
             shipRect = new Rectangle(50, 250, 150, 40);
 
             base.Initialize();
-            star1 = new Star(starTexture, new Rectangle(100, 100, 2, 2), new Vector2(-2, 0));
 
+            closeStars = new List<Star>();
+            for (int i = 0; i < 150; i++)
+            {
+                int x, y;
+                x = generator.Next(window.Width);
+                y = generator.Next(window.Height);
+                Rectangle star = new Rectangle(x, y, 3, 3);
+                closeStars.Add(new Star(starTexture, star, new  Vector2(-3, 0), Color.White));
+            }
+
+            farStars = new List<Star>();
+            for (int i = 0; i < 75; i ++)
+            {
+                int x, y;
+                x = generator.Next(window.Width);
+                y = generator.Next(window.Height);
+                Rectangle star = new Rectangle (x, y, 2, 2);
+                farStars.Add(new Star(starTexture, star, new Vector2 (-2, 0), Color.Gray));
+            }
         }
 
         protected override void LoadContent()
@@ -59,9 +88,66 @@ namespace Monogame_4___Assignment
 
             // TODO: Add your update logic here
 
-            star1.Update();
+            keyboardState = Keyboard.GetState();
 
+            foreach (Star star in closeStars)
+            {
+                star.Update();
+
+                if (star.Location.Right < 0)
+                    star.X = window.Width;
+            }
+
+            foreach (Star star in farStars)
+            {
+                star.Update();
+
+                if (star.Location.Right < 0)
+                    star.X = window.Width;
+            }
+
+
+            if (keyboardState.IsKeyDown(Keys.Down))
+            {
+                if (shipRect.Bottom < window.Height)
+                    shipRect.Offset(0, 4);
+
+            }
+
+            if (keyboardState.IsKeyDown(Keys.Up))
+            {
+                if (shipRect.Top > 0)
+                    shipRect.Offset(0, -4);
+            }
+
+            if (keyboardState.IsKeyDown(Keys.Left))
+            {
+                foreach (Star star in closeStars)
+                {
+                    star.X += 1;
+                }
+
+                foreach (Star star in farStars)
+                {
+                    star.X += 1;
+                }
+            }
+
+            if (keyboardState.IsKeyDown(Keys.Right))
+            {
+                foreach (Star star in closeStars)
+                {
+                    star.X -= 1;
+                }
+
+                foreach (Star star in farStars)
+                {
+                    star.X -= 1;
+                }
+            }
             base.Update(gameTime);
+
+            
         }
 
         protected override void Draw(GameTime gameTime)
@@ -70,7 +156,13 @@ namespace Monogame_4___Assignment
 
             _spriteBatch.Begin();
 
-            star1.Draw(_spriteBatch);
+
+            foreach (var star in closeStars)
+                star.Draw(_spriteBatch);
+
+            foreach (var star in farStars)
+                star.Draw(_spriteBatch);
+
             _spriteBatch.Draw(shipTexture, shipRect, Color.White);
 
             _spriteBatch.End();

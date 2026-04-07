@@ -13,13 +13,14 @@ namespace Monogame_4___Assignment
         private Rectangle _location;
         private Vector2 _speed;
         private Texture2D _texture;
+        private Color _color;
 
-        public Star(Texture2D texture, Rectangle location, Vector2 speed)
+        public Star(Texture2D texture, Rectangle location, Vector2 speed, Color color)
         {
             _location = location;
             _texture = texture;
             _speed = speed;
-
+            _color = color;
         }
 
         public void Update()
@@ -29,7 +30,24 @@ namespace Monogame_4___Assignment
 
         public void Draw(SpriteBatch spritebach)
         {
-            spritebach.Draw(_texture, _location, Color.White);
+            spritebach.Draw(_texture, _location, _color);
+        }
+
+        public Rectangle Location
+        {
+            get { return _location; }
+            set { _location = value; }
+        }
+        public int Y
+        {
+            get { return _location.Y; }
+            set { _location.Y = value; }
+        }
+
+        public int X
+        {
+            get { return _location.X; }
+            set { _location.X = value; }
         }
     }
 }

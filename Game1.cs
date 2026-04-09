@@ -15,7 +15,7 @@ namespace Monogame_4___Assignment
         private SpriteBatch _spriteBatch;
 
 
-        Rectangle window;
+        Rectangle window, windowRect;
 
         Rectangle shipRect;
 
@@ -43,19 +43,20 @@ namespace Monogame_4___Assignment
             _graphics.PreferredBackBufferHeight = 600;
             _graphics.ApplyChanges();
 
+            windowRect = new Rectangle(100, 75, 600, 450);
 
             generator = new Random();
 
-            shipRect = new Rectangle(50, 250, 150, 40);
+            shipRect = new Rectangle(120, 250, 150, 40);
 
             base.Initialize();
 
             closeStars = new List<Star>();
-            for (int i = 0; i < 150; i++)
+            for (int i = 0; i < 100; i++)
             {
                 int x, y;
-                x = generator.Next(window.Width);
-                y = generator.Next(window.Height);
+                x = generator.Next(windowRect.Left, windowRect.Right);
+                y = generator.Next(windowRect.Top, windowRect.Bottom);
                 Rectangle star = new Rectangle(x, y, 3, 3);
                 closeStars.Add(new Star(starTexture, star, new  Vector2(-3, 0), Color.White));
             }
@@ -64,8 +65,8 @@ namespace Monogame_4___Assignment
             for (int i = 0; i < 75; i ++)
             {
                 int x, y;
-                x = generator.Next(window.Width);
-                y = generator.Next(window.Height);
+                x = generator.Next(windowRect.Left, windowRect.Right);
+                y = generator.Next(windowRect.Top, windowRect.Bottom);
                 Rectangle star = new Rectangle (x, y, 2, 2);
                 farStars.Add(new Star(starTexture, star, new Vector2 (-2, 0), Color.Gray));
             }
@@ -94,29 +95,29 @@ namespace Monogame_4___Assignment
             {
                 star.Update();
 
-                if (star.Location.Right < 0)
-                    star.X = window.Width;
+                if (star.Location.Right < windowRect.Left)
+                    star.X = windowRect.Right;
             }
 
             foreach (Star star in farStars)
             {
                 star.Update();
 
-                if (star.Location.Right < 0)
-                    star.X = window.Width;
+                if (star.Location.Right < windowRect.Left)
+                    star.X = windowRect.Right;
             }
 
 
             if (keyboardState.IsKeyDown(Keys.Down))
             {
-                if (shipRect.Bottom < window.Height)
+                if (shipRect.Bottom < windowRect.Bottom)
                     shipRect.Offset(0, 4);
 
             }
 
             if (keyboardState.IsKeyDown(Keys.Up))
             {
-                if (shipRect.Top > 0)
+                if (shipRect.Top > windowRect.Top)
                     shipRect.Offset(0, -4);
             }
 
@@ -164,6 +165,8 @@ namespace Monogame_4___Assignment
                 star.Draw(_spriteBatch);
 
             _spriteBatch.Draw(shipTexture, shipRect, Color.White);
+
+
 
             _spriteBatch.End();
 
